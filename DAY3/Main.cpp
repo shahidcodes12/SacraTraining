@@ -22,13 +22,13 @@ void PrintVehicleInfo(const std::shared_ptr<Vehicle> &source)
   std::cout << "\n";
 }
 
+bool IsSedan(const std::shared_ptr<Vehicle>) {
+  return (vehicle->GetVehicleType() == "sedan");
+}
+
 void FindFirstSedan(const std::vector<std::shared_ptr<Vehicle>> &vehicles)
 {
-  auto itr{std::find_if(vehicles.begin(), vehicles.end(),
-                        [](const auto &vehicle) -> bool
-                        {
-                          return (vehicle->GetVehicleType() == "sedan");
-                        })};
+  auto itr{std::find_if(vehicles.begin(), vehicles.end(),IsSedan)};
 
   if (itr != vehicles.end())
   {
@@ -41,16 +41,19 @@ void FindFirstSedan(const std::vector<std::shared_ptr<Vehicle>> &vehicles)
 
 void FindCarByLicense(const std::vector<std::shared_ptr<Vehicle>> &vehicles, std::string license)
 {
-  auto itr = std::find_if(vehicles.begin(), vehicles.end(),
-                          [&license](const std::shared_ptr<Vehicle> &vehicle)
-                          {
-                            return (vehicle->GetLicensePlate() == license);
-                          });
+  std::map<std::string, std::shared_ptr<Vehicle>> vehicleList;
 
-  if (itr != vehicles.end())
+  for (auto itr{vehicles.begin()}; itr != vehicles.end(); itr++)
+  {
+    vehicleList.insert(make_pair((*itr)->GetLicensePlate(), *itr));
+  }
+
+  auto it{vehicleList.find(license)};
+
+  if (it != vehicleList.end())
   {
     std::cout << "\n---Vehicle Found---";
-    PrintVehicleInfo(*itr);
+    PrintVehicleInfo(it->second);
     return;
   }
   std::cout << "\n---Vehicle Not Found---\n";
